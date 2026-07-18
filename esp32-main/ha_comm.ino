@@ -61,6 +61,76 @@ void send_ha_mqtt_discovery() {
   payload2 += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
   payload2 += "}";
   mqttClient.publish(base2.c_str(), payload2.c_str(), true);
+
+  // Individual sensor discovery messages (MQ2, MQ5, MQ7, Temperature, Humidity, Flame)
+  String sensorsBase = String(HA_DISCOVERY_PREFIX) + "/sensor/" + DEVICE_ID;
+  String mq2_topic = String(BASE_TOPIC) + "/" + DEVICE_ID + "/mq2";
+  String mq5_topic = String(BASE_TOPIC) + "/" + DEVICE_ID + "/mq5";
+  String mq7_topic = String(BASE_TOPIC) + "/" + DEVICE_ID + "/mq7";
+  String temp_topic = String(BASE_TOPIC) + "/" + DEVICE_ID + "/temp";
+  String hum_topic = String(BASE_TOPIC) + "/" + DEVICE_ID + "/hum";
+  String flame_topic = String(BASE_TOPIC) + "/" + DEVICE_ID + "/flame";
+
+  // MQ2
+  String mq2_cfg = "{";
+  mq2_cfg += "\"name\":\"MQ2 Smoke\",";
+  mq2_cfg += "\"state_topic\":\"" + mq2_topic + "\",";
+  mq2_cfg += "\"unit_of_measurement\":\"ADC\",";
+  mq2_cfg += "\"unique_id\":\"" + String(DEVICE_ID) + "_mq2\",";
+  mq2_cfg += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
+  mq2_cfg += "}";
+  mqttClient.publish((sensorsBase + "/mq2/config").c_str(), mq2_cfg.c_str(), true);
+
+  // MQ5
+  String mq5_cfg = "{";
+  mq5_cfg += "\"name\":\"MQ5 LPG\",";
+  mq5_cfg += "\"state_topic\":\"" + mq5_topic + "\",";
+  mq5_cfg += "\"unit_of_measurement\":\"ADC\",";
+  mq5_cfg += "\"unique_id\":\"" + String(DEVICE_ID) + "_mq5\",";
+  mq5_cfg += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
+  mq5_cfg += "}";
+  mqttClient.publish((sensorsBase + "/mq5/config").c_str(), mq5_cfg.c_str(), true);
+
+  // MQ7
+  String mq7_cfg = "{";
+  mq7_cfg += "\"name\":\"MQ7 CO\",";
+  mq7_cfg += "\"state_topic\":\"" + mq7_topic + "\",";
+  mq7_cfg += "\"unit_of_measurement\":\"ADC\",";
+  mq7_cfg += "\"unique_id\":\"" + String(DEVICE_ID) + "_mq7\",";
+  mq7_cfg += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
+  mq7_cfg += "}";
+  mqttClient.publish((sensorsBase + "/mq7/config").c_str(), mq7_cfg.c_str(), true);
+
+  // Temperature sensor
+  String temp_cfg = "{";
+  temp_cfg += "\"name\":\"Ambient Temperature\",";
+  temp_cfg += "\"state_topic\":\"" + temp_topic + "\",";
+  temp_cfg += "\"unit_of_measurement\":\"°C\",";
+  temp_cfg += "\"unique_id\":\"" + String(DEVICE_ID) + "_temp\",";
+  temp_cfg += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
+  temp_cfg += "}";
+  mqttClient.publish((sensorsBase + "/temp/config").c_str(), temp_cfg.c_str(), true);
+
+  // Humidity sensor
+  String hum_cfg = "{";
+  hum_cfg += "\"name\":\"Ambient Humidity\",";
+  hum_cfg += "\"state_topic\":\"" + hum_topic + "\",";
+  hum_cfg += "\"unit_of_measurement\":\"%\",";
+  hum_cfg += "\"unique_id\":\"" + String(DEVICE_ID) + "_hum\",";
+  hum_cfg += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
+  hum_cfg += "}";
+  mqttClient.publish((sensorsBase + "/hum/config").c_str(), hum_cfg.c_str(), true);
+
+  // Flame binary sensor (use binary_sensor discovery)
+  String flame_base = String(HA_DISCOVERY_PREFIX) + "/binary_sensor/" + DEVICE_ID + "/flame/config";
+  String flame_payload = "{";
+  flame_payload += "\"name\":\"Flame Sensor\",";
+  flame_payload += "\"state_topic\":\"" + flame_topic + "\",";
+  flame_payload += "\"device_class\":\"safety\","; // best-effort device class
+  flame_payload += "\"unique_id\":\"" + String(DEVICE_ID) + "_flame\",";
+  flame_payload += "\"device\":{\"identifiers\":[\"" + String(DEVICE_ID) + "\"],\"name\":\"Fire Detector\"}";
+  flame_payload += "}";
+  mqttClient.publish(flame_base.c_str(), flame_payload.c_str(), true);
 }
 
 void mqtt_connect() {
